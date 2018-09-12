@@ -7,7 +7,7 @@
  * @Author  Almsaeed Studio
  * @Support <http://www.almsaeedstudio.com>
  * @Email   <abdullah@almsaeedstudio.com>
- * @version 2.3.7
+ * @version 2.3.8
  * @license MIT <http://opensource.org/licenses/MIT>
  */
 
@@ -63,6 +63,8 @@ $.AdminLTE.options = {
     //choose to enable the plugin, make sure you load the script
     //before AdminLTE's app.js
     enableFastclick: false,
+    //Control Sidebar Tree views
+    enableControlTreeView: true,
     //Control Sidebar Options
     enableControlSidebar: true,
     controlSidebarOptions: {
@@ -146,8 +148,8 @@ $(function () {
     //Extend options if external options exist
     if (typeof AdminLTEOptions !== "undefined") {
         $.extend(true,
-                $.AdminLTE.options,
-                AdminLTEOptions);
+            $.AdminLTE.options,
+            AdminLTEOptions);
     }
 
     //Easy access to options
@@ -160,7 +162,9 @@ $(function () {
     $.AdminLTE.layout.activate();
 
     //Enable sidebar tree view controls
-    $.AdminLTE.tree('.sidebar');
+    if (o.enableControlTreeView) {
+        $.AdminLTE.tree('.sidebar');
+    }
 
     //Enable control sidebar
     if (o.enableControlSidebar) {
@@ -184,7 +188,8 @@ $(function () {
     //Activate Bootstrap tooltip
     if (o.enableBSToppltip) {
         $('body').tooltip({
-            selector: o.BSTooltipSelector
+            selector: o.BSTooltipSelector,
+            container: 'body'
         });
     }
 
@@ -240,22 +245,26 @@ function _init() {
     $.AdminLTE.layout = {
         activate: function () {
             var _this = this;
-            _this.fix();
+            //_this.fix();
             _this.fixSidebar();
+            //$('body, html, .wrapper').css('height', 'auto');
             $(window, ".wrapper").resize(function () {
-                _this.fix();
+                //_this.fix();
                 _this.fixSidebar();
             });
         },
         fix: function () {
+            // Remove overflow from .wrapper if layout-boxed exists
+            $(".layout-boxed > .wrapper").css('overflow', 'hidden');
             //Get window height and the wrapper height
-            var neg = $('.main-header').outerHeight() + $('.main-footer').outerHeight();
+            var footer_height = $('.main-footer').outerHeight() || 0;
+            var neg = $('.main-header').outerHeight() + footer_height;
             var window_height = $(window).height();
-            var sidebar_height = $(".sidebar").height();
+            var sidebar_height = $(".sidebar").height() || 0;
             //Set the min-height of the content and sidebar based on the
             //the height of the document.
             if ($("body").hasClass("fixed")) {
-                $(".content-wrapper, .right-side").css('min-height', window_height - $('.main-footer').outerHeight());
+                $(".content-wrapper, .right-side").css('min-height', window_height - footer_height);
             } else {
                 var postSetWidth;
                 if (window_height >= sidebar_height) {
@@ -289,13 +298,15 @@ function _init() {
             if ($.AdminLTE.options.sidebarSlimScroll) {
                 if (typeof $.fn.slimScroll != 'undefined') {
                     //Destroy if it exists
-                    $(".sidebar").slimScroll({destroy: true}).height("auto");
-                    //Add slimscroll
-                    $(".sidebar").slimscroll({
-                        height: ($(window).height() - $(".main-header").height()) + "px",
-                        color: "rgba(0,0,0,0.2)",
-                        size: "3px"
-                    });
+                    $(".sidebar").slimScroll({destroy: true}).height("auto").css("overflow", "inherit");
+                    if (!$("body").hasClass('sidebar-collapse')) {
+                        //Add slimscroll
+                        $(".sidebar").slimscroll({
+                            height: ($(window).height() - $(".main-header").height()) + "px",
+                            color: "rgba(0,0,0,0.2)",
+                            size: "8px"
+                        });
+                    }
                 }
             }
         }
@@ -333,6 +344,7 @@ function _init() {
                         $("body").addClass('sidebar-open').trigger('expanded.pushMenu');
                     }
                 }
+                $.AdminLTE.layout.fixSidebar();
             });
 
             $(".content-wrapper").click(function () {
@@ -343,9 +355,7 @@ function _init() {
             });
 
             //Enable expand on hover for sidebar mini
-            if ($.AdminLTE.options.sidebarExpandOnHover
-                    || ($('body').hasClass('fixed')
-                            && $('body').hasClass('sidebar-mini'))) {
+            if ($.AdminLTE.options.sidebarExpandOnHover) {
                 this.expandOnHover();
             }
         },
@@ -355,14 +365,14 @@ function _init() {
             //Expand sidebar on hover
             $('.main-sidebar').hover(function () {
                 if ($('body').hasClass('sidebar-mini')
-                        && $("body").hasClass('sidebar-collapse')
-                        && $(window).width() > screenWidth) {
+                    && $("body").hasClass('sidebar-collapse')
+                    && $(window).width() > screenWidth) {
                     _this.expand();
                 }
             }, function () {
                 if ($('body').hasClass('sidebar-mini')
-                        && $('body').hasClass('sidebar-expanded-on-hover')
-                        && $(window).width() > screenWidth) {
+                    && $('body').hasClass('sidebar-expanded-on-hover')
+                    && $(window).width() > screenWidth) {
                     _this.collapse();
                 }
             });
@@ -389,56 +399,58 @@ function _init() {
         var _this = this;
         var animationSpeed = $.AdminLTE.options.animationSpeed;
         $(document).off('click', menu + ' li a')
-                .on('click', menu + ' li a', function (e) {
-                    //Get the clicked link and the next element
-                    var $this = $(this);
-                    var checkElement = $this.next();
+            .on('click', menu + ' li a', function (e) {
+                //Get the clicked link and the next element
+                var $this = $(this);
+                var checkElement = $this.next();
 
-                    //Check if the next element is a menu and is visible
-                    if ((checkElement.is('.treeview-menu')) && (checkElement.is(':visible')) && (!$('body').hasClass('sidebar-collapse'))) {
-                        //Close the menu
-                        checkElement.slideUp(animationSpeed, function () {
-                            checkElement.removeClass('menu-open');
-                            //Fix the layout in case the sidebar stretches over the height of the window
-                            //_this.layout.fix();
-                        });
-                        checkElement.parent("li").removeClass("active");
+                //Check if the next element is a menu and is visible
+                if ((checkElement.is('.treeview-menu')) && (checkElement.is(':visible')) && (!$('body').hasClass('sidebar-collapse'))) {
+                    //Close the menu
+                    checkElement.slideUp(animationSpeed, function () {
+                        checkElement.removeClass('menu-open');
+                        //Fix the layout in case the sidebar stretches over the height of the window
+                        //_this.layout.fix();
+                    });
+                    checkElement.parent("li").removeClass("active");
+                }
+                //If the menu is not visible
+                else if ((checkElement.is('.treeview-menu')) && (!checkElement.is(':visible'))) {
+                    //Get the parent menu
+                    var parent = $this.parents('ul').first();
+                    // modified by FastAdmin
+                    if ($(".show-submenu", menu).size() == 0) {
+                        //Close all open menus within the parent
+                        var ul = parent.find('ul:visible').slideUp(animationSpeed);
+                        //Remove the menu-open class from the parent
+                        ul.removeClass('menu-open');
                     }
-                    //If the menu is not visible
-                    else if ((checkElement.is('.treeview-menu')) && (!checkElement.is(':visible'))) {
-                        //Get the parent menu
-                        var parent = $this.parents('ul').first();
-                        if ($(".show-submenu", menu).size() == 0) {
-                            //Close all open menus within the parent
-                            var ul = parent.find('ul:visible').slideUp(animationSpeed);
-                            //Remove the menu-open class from the parent
-                            ul.removeClass('menu-open');
-                        }
-                        //Get the parent li
-                        var parent_li = $this.parent("li");
+                    //Get the parent li
+                    var parent_li = $this.parent("li");
 
-                        //Open the target menu and add the menu-open class
-                        checkElement.slideDown(animationSpeed, function () {
-                            //Add the class active to the parent li
-                            checkElement.addClass('menu-open');
-                            //parent.find('li.active').removeClass('active');
-                            //parent_li.addClass('active');
-                            //Fix the layout in case the sidebar stretches over the height of the window
-                            _this.layout.fix();
-                        });
-                    } else {
-                        if (!$this.parent().hasClass("active")) {
-                            $this.parent().addClass("active");
-                        }
-                        if ($(".show-submenu", menu).size() == 0) {
-                            $this.parent().siblings().find("ul.menu-open").slideUp();
-                        }
+                    //Open the target menu and add the menu-open class
+                    checkElement.slideDown(animationSpeed, function () {
+                        //Add the class active to the parent li
+                        checkElement.addClass('menu-open');
+                        //parent.find('li.active').removeClass('active');
+                        //parent_li.addClass('active');
+                        //Fix the layout in case the sidebar stretches over the height of the window
+                        _this.layout.fix();
+                    });
+                } else {
+                    if (!$this.parent().hasClass("active")) {
+                        $this.parent().addClass("active");
                     }
-                    //if this isn't a link, prevent the page from being redirected
-                    if (checkElement.is('.treeview-menu')) {
-                        e.preventDefault();
+                    // modified by FastAdmin
+                    if ($(".show-submenu", menu).size() == 0) {
+                        $this.parent().siblings().find("ul.menu-open").slideUp();
                     }
-                });
+                }
+                //if this isn't a link, prevent the page from being redirected
+                if (checkElement.is('.treeview-menu')) {
+                    e.preventDefault();
+                }
+            });
     };
 
     /* ControlSidebar
@@ -465,7 +477,7 @@ function _init() {
                 e.preventDefault();
                 //If the sidebar is not open
                 if (!sidebar.hasClass('control-sidebar-open')
-                        && !$('body').hasClass('control-sidebar-open')) {
+                    && !$('body').hasClass('control-sidebar-open')) {
                     //Open the sidebar
                     _this.open(sidebar, o.slide);
                 } else {
@@ -576,8 +588,8 @@ function _init() {
             if (!box.hasClass("collapsed-box")) {
                 //Convert minus into plus
                 element.children(":first")
-                        .removeClass(_this.icons.collapse)
-                        .addClass(_this.icons.open);
+                    .removeClass(_this.icons.collapse)
+                    .addClass(_this.icons.open);
                 //Hide the content
                 box_content.slideUp(_this.animationSpeed, function () {
                     box.addClass("collapsed-box");
@@ -585,8 +597,8 @@ function _init() {
             } else {
                 //Convert plus into minus
                 element.children(":first")
-                        .removeClass(_this.icons.open)
-                        .addClass(_this.icons.collapse);
+                    .removeClass(_this.icons.open)
+                    .addClass(_this.icons.collapse);
                 //Show the content
                 box_content.slideDown(_this.animationSpeed, function () {
                     box.removeClass("collapsed-box");
@@ -770,16 +782,13 @@ function _init() {
     };
 
     //set/get form element value
-    $.fn.field = function (name, value)
-    {
+    $.fn.field = function (name, value) {
         if (typeof name !== "string")
             return false;
         var element = $(this).find("[name='" + name + "']");
 
-        if (typeof value === "undefined" && element.length >= 1)
-        {
-            switch (element.attr("type"))
-            {
+        if (typeof value === "undefined" && element.length >= 1) {
+            switch (element.attr("type")) {
                 case "checkbox":
                     var result = new Array();
                     element.each(function (i, val) {
@@ -802,10 +811,8 @@ function _init() {
                     return element.val();
                     break;
             }
-        } else
-        {
-            switch (element.attr("type"))
-            {
+        } else {
+            switch (element.attr("type")) {
                 case "checkbox":
                 case "radio":
                     value = $.isArray(value) ? value : [value];
