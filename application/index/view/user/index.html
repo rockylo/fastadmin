@@ -27,7 +27,7 @@
                     <div class="row user-baseinfo">
                         <div class="col-md-3 col-sm-3 col-xs-2 text-center user-center">
                             <a href="{:url('user/profile')}" title="{:__('Click to edit')}">
-                                <span class="avatar-img"><img src="{$user.avatar}" alt=""></span>
+                                <span class="avatar-img"><img src="{$user.avatar|cdnurl}" alt=""></span>
                             </a>
                         </div>
                         <div class="col-md-9 col-sm-9 col-xs-10">
@@ -44,11 +44,13 @@
                                 <!-- Success -->
                                 <div class="basicinfo">
                                     <div class="row">
-                                        <div class="col-xs-4 col-md-2">{:__('Lv')}</div>
-                                        <div class="col-xs-8 col-md-4"><a href="javascript:;" class="viewlv">{$user.level}</a>
+                                        <div class="col-xs-4 col-md-2">{:__('Money')}</div>
+                                        <div class="col-xs-8 col-md-4">
+                                            <a href="javascript:;" class="viewmoney">{$user.money}</a>
                                         </div>
                                         <div class="col-xs-4 col-md-2">{:__('Score')}</div>
-                                        <div class="col-xs-8 col-md-4"><a href="javascript:;" class="viewscore">{$user.score}</a>
+                                        <div class="col-xs-8 col-md-4">
+                                            <a href="javascript:;" class="viewscore">{$user.score}</a>
                                         </div>
                                     </div>
                                     <div class="row">

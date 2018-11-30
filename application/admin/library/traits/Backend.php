@@ -81,7 +81,7 @@ trait Backend
                     //是否采用模型验证
                     if ($this->modelValidate) {
                         $name = str_replace("\\model\\", "\\validate\\", get_class($this->model));
-                        $validate = is_bool($this->modelValidate) ? ($this->modelSceneValidate ? $name . '.add' : true) : $this->modelValidate;
+                        $validate = is_bool($this->modelValidate) ? ($this->modelSceneValidate ? $name . '.add' : $name) : $this->modelValidate;
                         $this->model->validate($validate);
                     }
                     $result = $this->model->allowField(true)->save($params);
@@ -121,8 +121,8 @@ trait Backend
                 try {
                     //是否采用模型验证
                     if ($this->modelValidate) {
-                        $name = basename(str_replace('\\', '/', get_class($this->model)));
-                        $validate = is_bool($this->modelValidate) ? ($this->modelSceneValidate ? $name . '.edit' : true) : $this->modelValidate;
+                        $name = str_replace("\\model\\", "\\validate\\", get_class($this->model));
+                        $validate = is_bool($this->modelValidate) ? ($this->modelSceneValidate ? $name . '.edit' : $name) : $this->modelValidate;
                         $row->validate($validate);
                     }
                     $result = $row->allowField(true)->save($params);
@@ -227,7 +227,9 @@ trait Backend
         if ($ids) {
             if ($this->request->has('params')) {
                 parse_str($this->request->post("params"), $values);
-                $values = array_intersect_key($values, array_flip(is_array($this->multiFields) ? $this->multiFields : explode(',', $this->multiFields)));
+                if (!$this->auth->isSuperAdmin()) {
+                    $values = array_intersect_key($values, array_flip(is_array($this->multiFields) ? $this->multiFields : explode(',', $this->multiFields)));
+                }
                 if ($values) {
                     $adminIds = $this->getDataLimitAdminIds();
                     if (is_array($adminIds)) {

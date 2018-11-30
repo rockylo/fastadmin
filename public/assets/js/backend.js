@@ -195,7 +195,9 @@ define(['fast', 'template', 'moment'], function (Fast, Template, Moment) {
                 }
                 //如果未设备成功的回调,设定了自动刷新的情况下自动进行刷新
                 if (!success && typeof options.tableId !== 'undefined' && typeof options.refresh !== 'undefined' && options.refresh) {
-                    $("#" + options.tableId).bootstrapTable('refresh');
+                    success = function () {
+                        $("#" + options.tableId).bootstrapTable('refresh');
+                    }
                 }
                 if (typeof options.confirm !== 'undefined') {
                     Layer.confirm(options.confirm, function (index) {
@@ -204,6 +206,28 @@ define(['fast', 'template', 'moment'], function (Fast, Template, Moment) {
                     });
                 } else {
                     Backend.api.ajax(options, success, error);
+                }
+                return false;
+            });
+            $(document).on('click', '.btn-click,.clickit', function (e) {
+                var that = this;
+                var options = $.extend({}, $(that).data() || {});
+                var row = {};
+                if (typeof options.tableId !== 'undefined') {
+                    var index = parseInt(options.rowIndex);
+                    var data = $("#" + options.tableId).bootstrapTable('getData');
+                    row = typeof data[index] !== 'undefined' ? data[index] : {};
+                }
+                var button = Backend.api.gettablecolumnbutton(options);
+                var click = typeof button.click === 'function' ? button.click : $.noop;
+
+                if (typeof options.confirm !== 'undefined') {
+                    Layer.confirm(options.confirm, function (index) {
+                        click.apply(that, [options, row, button]);
+                        Layer.close(index);
+                    });
+                } else {
+                    click.apply(that, [options, row, button]);
                 }
                 return false;
             });

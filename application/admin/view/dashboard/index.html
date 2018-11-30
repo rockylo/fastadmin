@@ -122,6 +122,11 @@
         padding:30px 0;
     }
 </style>
+{if preg_match('/\/admin\/|admin\.php|admin_d75KABNWt\.php/i', url())}
+<div class="alert alert-danger-light">
+    {:__('Security tips')}
+</div>
+{/if}
 <div class="panel panel-default panel-intro">
     <div class="panel-heading">
         {:build_heading(null, false)}
@@ -294,11 +299,11 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h1 class="no-margins">1234</h1>
-                                            <div class="font-bold text-navy"><i class="fa fa-commenting"></i> <small>{:__('Comment count')}</small></div>
+                                            <div class="font-bold"><i class="fa fa-commenting"></i> <small>{:__('Comment count')}</small></div>
                                         </div>
                                         <div class="col-md-6">
                                             <h1 class="no-margins">6754</h1>
-                                            <div class="font-bold text-navy"><i class="fa fa-heart"></i> <small>{:__('Like count')}</small></div>
+                                            <div class="font-bold"><i class="fa fa-heart"></i> <small>{:__('Like count')}</small></div>
                                         </div>
                                     </div>
                                 </div>
@@ -317,11 +322,11 @@
                                     <div class="row">
                                         <div class="col-md-6">
                                             <h1 class="no-margins">5302</h1>
-                                            <div class="font-bold text-navy"><i class="fa fa-commenting"></i> <small>{:__('Comment count')}</small></div>
+                                            <div class="font-bold"><i class="fa fa-commenting"></i> <small>{:__('Comment count')}</small></div>
                                         </div>
                                         <div class="col-md-6">
                                             <h1 class="no-margins">8205</h1>
-                                            <div class="font-bold text-navy"><i class="fa fa-user"></i> <small>{:__('Like count')}</small></div>
+                                            <div class="font-bold"><i class="fa fa-user"></i> <small>{:__('Like count')}</small></div>
                                         </div>
                                     </div>
                                 </div>

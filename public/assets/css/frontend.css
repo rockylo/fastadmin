@@ -38,11 +38,11 @@ body {
 }
 /*预览区域*/
 .plupload-preview {
-  padding: 10px;
+  padding: 0 10px;
   margin-bottom: 0;
 }
 .plupload-preview li {
-  margin-bottom: 10px;
+  margin-top: 10px;
 }
 .plupload-preview .thumbnail {
   margin-bottom: 10px;
@@ -201,6 +201,23 @@ body {
   line-height: 1.5;
   padding: 4px 13px;
 }
+.fieldlist dd {
+  display: block;
+  margin: 5px 0;
+}
+.fieldlist dd input {
+  display: inline-block;
+  width: 300px;
+}
+.fieldlist dd input:first-child {
+  width: 110px;
+}
+.fieldlist dd ins {
+  width: 110px;
+  display: inline-block;
+  text-decoration: none;
+  font-weight: bold;
+}
 /* 弹窗中的表单 */
 .form-layer {
   height: 100%;
@@ -235,9 +252,6 @@ footer.footer {
   color: #aaa;
   background: #555;
   margin-top: 25px;
-  position: fixed;
-  bottom: 0;
-  z-index: 99;
 }
 footer.footer .copyright {
   line-height: 50px;
@@ -353,12 +367,9 @@ footer.footer .copyright a:hover {
 main.content {
   width: 100%;
   overflow: auto;
-  top: 0;
-  position: absolute;
-  z-index: 10;
-  bottom: 50px;
   padding: 15px;
-  padding-top: 67px;
+  padding-top: 20px;
+  min-height: calc(100vh - 125px);
 }
 .sidenav {
   padding: 20px 0 10px 0;
@@ -474,5 +485,26 @@ main.content {
     padding: 10px;
     line-height: 30px;
   }
+}
+.pager .pagination {
+  margin: 0;
+}
+.pager li {
+  margin: 0 .4em;
+  display: inline-block;
+}
+.pager li:first-child > a,
+.pager li:last-child > a,
+.pager li:first-child > span,
+.pager li:last-child > span {
+  padding: .5em 1.2em;
+}
+.pager li > a,
+.pager li > span {
+  background: none;
+  border: 1px solid #e6e6e6;
+  border-radius: 0.25em;
+  padding: .5em .93em;
+  font-size: 14px;
 }
 /*# sourceMappingURL=../css/frontend.css.map */

@@ -206,7 +206,8 @@ define(['jquery', 'bootstrap', 'toastr', 'layer', 'lang'], function ($, undefine
                         if ($(this).hasClass("disabled") || $(this).parent().hasClass("disabled")) {
                             return;
                         }
-                        $(".btn:eq(" + $(this).index() + ")", layerfooter).trigger("click");
+                        var index = footer.find('.btn').index(this);
+                        $(".btn:eq(" + index + ")", layerfooter).trigger("click");
                     });
 
                     var titHeight = layero.find('.layui-layer-title').outerHeight() || 0;
@@ -249,7 +250,7 @@ define(['jquery', 'bootstrap', 'toastr', 'layer', 'lang'], function ($, undefine
                 i = 1;
             string = string.toLowerCase();
             //string = typeof Lang[string] != 'undefined' ? Lang[string] : string;
-            if (typeof Lang[string] != 'undefined') {
+            if (typeof Lang !== 'undefined' && typeof Lang[string] !== 'undefined') {
                 if (typeof Lang[string] == 'object')
                     return Lang[string];
                 string = Lang[string];
